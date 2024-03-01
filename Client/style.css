@@ -76,7 +76,7 @@
 
 .body__message-my{
   align-self: flex-end;
-  direction: rtl;
+  text-align: right;
   background-color: #cc9d66;
   transition: all 1s linear;
 }

@@ -91,11 +91,10 @@ form.onsubmit = (e) => {
     socket.onopen = (e) => {
       console.log('onopen WebSocket opened');
       sendMsg(data);
-      textArea.value='';
     }
   } else if (socket.readyState == 1) {
     sendMsg(data);
-    textArea.value='';
+    
   }
 
   socket.onerror = (e) => {
@@ -118,16 +117,13 @@ form.onsubmit = (e) => {
     bodyHystory.append(publishingMessage);
     sendingMessageQueue.set(data, publishingMessage);
     socket.send(JSON.stringify(data));
-
+    textArea.value='';
+    textArea.focus();
   }
 }
 
 function getPublishingMessage(data) {
   for (const [key, value] of sendingMessageQueue) {
-    console.log('gPM| sendingMessageQueue key.date: ' + key.date);
-    console.log('gPM| sendingMessageQueue value: ' + value);
-    console.log('gPM| compare date:',key.date === data.date);
-    console.log('gPM| compare date:key.from === data.to',key.from === data.to);
     if ((key.from === data.to) && (key.date === data.date)) {
       sendingMessageQueue.delete(key);
       //value.style.transition = 'all linear 1s';
@@ -151,8 +147,6 @@ function getPublishingMessage(data) {
   div.append(messageP);
   return div;
 }
-
-
 
 // find cookie by the name
 function getCookie(name) {
