@@ -1,0 +1,95 @@
+.container{
+  position: absolute;
+  width: 500px;
+  height: 80%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: auto;
+  border: 1px solid violet;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.container__header{
+  height: 30px;
+  background: beige;
+}
+
+.container__body{
+  flex: auto;
+  background: lightblue;
+}
+
+.container__footer{
+  height: 30px;
+  background: lightsalmon;
+}
+
+.body{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.body__username{
+  height: auto;
+  background: lightcyan;
+}
+
+.username{}
+
+#changeNameBtn{
+
+}
+
+#changeAccountBtn{
+
+}
+
+.body__hystory{
+  flex: auto;
+  background: lightgreen;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.body__message{
+  margin: 10px;
+  width: 70%;
+  align-self: flex-start;
+  border: 1px solid #000;
+}
+
+.body__message-my{
+  align-self: flex-end;
+  direction: rtl;
+  background-color: #cc9d66;
+}
+
+.body__message-my_sended{
+  background-color: #84d391;
+}
+
+.body__form{
+  height: 100px;
+  margin: 10px;
+  background: lightseagreen;
+}
+
+.form{
+  display: flex;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.form__text{
+  flex:auto
+}
+
+.form__button{
+  width: 100px;
+}
+

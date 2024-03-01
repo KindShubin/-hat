@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./style.css">
+  <!-- <link rel="stylesheet" href="http://localhost:3000/Client/style.css"> -->
+</head>
+<body>
+  <div class="container">
+    <section class="container__header">header</section>
+    <section class="container__body body">
+      <div class="body__username">
+        <p>Your account:<span class="username" contentEditable></span></p>
+        <p>
+          <button id="changeNameBtn">Change Name:</button>
+          <button id="changeAccountBtn">Change Account:</button>
+        </p>
+      </div>
+      <div class="body__hystory">
+        <div class="body__message">some text</div>
+        <div class="body__message body__message-my">some text</div>
+      </div>
+      <div class="body__form">
+        <form action="send" method="post" class="form" id="form">
+          <input type="text" name="textArea" id="textArea" class="form__text">
+          <input type="submit" value="Send" class="form__button">
+        </form>
+      </div>
+    </section>
+    <section class="container__footer">footer</section>
+  </div>
+  <script src="./script.js"></script>
+  <!-- <script src="http://localhost:3000/Client/script.js"></script> -->
+</body>
+</html>
