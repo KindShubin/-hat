@@ -10,7 +10,7 @@ const ws = require('ws');
 // import WebSocket, { WebSocketServer } from 'ws';
 
 //const wss = new ws.Server({noServer: true});
-const wss = new ws.Server({port: 3001});
+const wss = new ws.Server({ port: 3001 });
 //const wss = new ws.WebSocketServer( { port:8080 }); 
 // const wss = new WebSocketServer({ port: 8080 });
 //const wss = new ws.Server({noServer: true});
@@ -20,8 +20,8 @@ const port = 3000;
 app.use(cookieParser());
 
 const pathServer = path.join(__dirname);
-const pathProject = path.join(__dirname,'..');
-const pathClient = path.join(__dirname,'..','Client');
+const pathProject = path.join(__dirname, '..');
+const pathClient = path.join(__dirname, '..', 'Client');
 
 /// MySQL
 const con = mysql.createConnection({
@@ -31,7 +31,7 @@ const con = mysql.createConnection({
   database: "chat"
 });
 
-con.connect(function(err) {
+con.connect(function (err) {
   if (err) throw err;
   console.log("Connected!");
   const sql = "SELECT * FROM users";
@@ -52,7 +52,7 @@ app.get('/', (req, res) => {
     // no: set a new cookie
     uid = uuidv4();
     console.log(`create new uid:${uid}`);
-    con.connect(function(err) {
+    con.connect(function (err) {
       const sql = `INSERT INTO users (id, name, surname, description) VALUES ('${uid}', '', '', '');`;
       con.query(sql, function (err, result) {
         if (err) throw err;
@@ -62,13 +62,11 @@ app.get('/', (req, res) => {
   } else {
     // yes, cookie was already present 
     console.log('cookie id exists ', uid);
-  } 
+  }
   res.cookie('username', uid);
   res.cookie('uid', uid, { httpOnly: true });
   console.log('cookie created successfully');
   res.sendFile(pathClient + '/index.html');
-  //res.redirect('../Client/index.html');
-  //res.send('Hello World!')
 })
 
 // app.get('/Client/*', (req, res) => {
@@ -82,7 +80,6 @@ app.use(express.urlencoded());
 
 app.post('/changename', (reg, res) => {
   console.log('POST');
-  //console.dir(reg);
   console.log(reg.body);
   console.log(reg.body.name);
   res.send('respond to the post');
@@ -102,23 +99,21 @@ function onConnect(wsClient) {
     console.log('JSON.parse', JSON.parse(data));
     clients.set(wsClient, JSON.parse(data).from)
 
-    // clients.filter((client) => client != wsClient)
-    //   .forEach((client) => {
-      for(const [key, value] of clients.entries()){
-        const newData = {
-          date: JSON.parse(data).date,
-          from: JSON.parse(data).from,
-          to: JSON.parse(data).to === 0 ? value : JSON.parse(data).to,
-          data: JSON.parse(data).data,
-        }
-        key.send(JSON.stringify(newData));
-      };
+    for (const [key, value] of clients.entries()) {
+      const newData = {
+        date: JSON.parse(data).date,
+        from: JSON.parse(data).from,
+        to: JSON.parse(data).to === 0 ? value : JSON.parse(data).to,
+        data: JSON.parse(data).data,
+      }
+      //key.send(JSON.stringify(newData));
+      setTimeout(() => key.send(JSON.stringify(newData)), 1000);
+    };
   });
-  wsClient.on('close', function() {
-    // отправка уведомления в консоль
+
+  wsClient.on('close', function () {
     console.log('user gone');
-    clients.splice(clients.indexOf(wsClient), 1);
-    //clients = clients.filter((client) => client != wsClient);
+    clients.delete(wsClient);
   });
   wsClient.on('error', console.error);
 }

@@ -56,7 +56,6 @@ changeNameButton.onclick = async (e) => {
   console.log(formData);
   let response = await fetch('/changename', {
     method: 'POST',
-    //body: formData
     body: 'azazaza'
   });
   let result = await response.text();
@@ -70,19 +69,18 @@ bodyHystory.append(cookieMessage);
 
 // WebSocket
 let socket;
-let sendingMessageQueue = [];
+let sendingMessageQueue = new Map();
+
 form.onsubmit = (e) => {
-  console.log('form.onsubmit. socket:', socket);
   e.preventDefault();
   const text = form.elements.textArea.value;
-  console.log('text from textArea:', text);
   if (!text) {
     return false;
   }
   socket = socket ? socket : new WebSocket("ws://localhost:3001");
 
   const data = {
-    date: new Date(),
+    date: new Date().getTime(),
     from: cookieUserName,//temporary!!!
     to: 0,//0 - to all
     data: text,
@@ -93,60 +91,63 @@ form.onsubmit = (e) => {
     socket.onopen = (e) => {
       console.log('onopen WebSocket opened');
       sendMsg(data);
+      textArea.value='';
     }
   } else if (socket.readyState == 1) {
     sendMsg(data);
+    textArea.value='';
   }
 
   socket.onerror = (e) => {
     console.log('onerror error');
     console.log(e);
   }
+
+  //received message
   socket.onmessage = (e) => {
     console.log('onmessage');
-    const data = e.data;
+    const data = JSON.parse(e.data);
     console.log(data);
-    console.log(JSON.parse(data));
-    console.log(`onmessage sendingMessageQueue:${sendingMessageQueue}`);
     bodyHystory.append(getPublishingMessage(data));
-    console.log(`onmessage sendingMessageQueue:${sendingMessageQueue}`);
   }
   socket.onclose = (e) => {
     console.log('onclose Websocket close');
   }
-  function sendMsg(data){
+  function sendMsg(data) {
     publishingMessage = getPublishingMessage(data);
     bodyHystory.append(publishingMessage);
-    sendingMessageQueue.push([data, publishingMessage]);
+    sendingMessageQueue.set(data, publishingMessage);
     socket.send(JSON.stringify(data));
-    console.log(`sendingMessageQueue:${sendingMessageQueue}`);
+
   }
 }
 
-function getPublishingMessage(data){
+function getPublishingMessage(data) {
+  for (const [key, value] of sendingMessageQueue) {
+    console.log('gPM| sendingMessageQueue key.date: ' + key.date);
+    console.log('gPM| sendingMessageQueue value: ' + value);
+    console.log('gPM| compare date:',key.date === data.date);
+    console.log('gPM| compare date:key.from === data.to',key.from === data.to);
+    if ((key.from === data.to) && (key.date === data.date)) {
+      sendingMessageQueue.delete(key);
+      //value.style.transition = 'all linear 1s';
+      //value.style.backgroundColor = '#84d391';
+      //value.style = 'background-color: #84d391; transition: all 1s;';
+      value.classList.add('body__message-my_sended');
+      return value;
+    }
+  }
   const div = document.createElement('div');
   div.classList.add('body__message');
-  if(data.from === cookieUserName) {
+  if (data.from === cookieUserName) {
     div.classList.add('body__message-my');
   }
-  if(data.from === data.to){
-    const sendedMessage = sendingMessageQueue.filter((el) => {
-      console.log('gPM| sendingMessageQueue.el[0]:'+el[0]);
-      console.log('gPM| sendingMessageQueue.data:'+data);
-      if(el[0] == data){
-        return el;
-      }
-    })[1];
-    console.log('gPM| sendedMessage:'+sendedMessage);
-    sendingMessageQueue = sendingMessageQueue.filter((el) => el[0] != data);
-    sendedMessage.classList.add('body__message-my_sended');
-  }
   const metaP = document.createElement('p');
-  metaP.style = "font-size: 0.8em; color: grey;";
-  metaP.textContent = data.from + '/n' + data.date;
+  metaP.classList.add('body__message-meta');
+  metaP.insertAdjacentHTML('afterbegin', data.from + '<br>' + getCorrectTime(new Date(data.date)));
   div.append(metaP);
   const messageP = document.createElement('p');
-  metaP.textContent = data.data;
+  messageP.textContent = data.data;
   div.append(messageP);
   return div;
 }
@@ -159,4 +160,14 @@ function getCookie(name) {
     "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
   ));
   return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+function getCorrectTime(date){
+  const year = date.getFullYear();
+  const month = date.getMonth()+1;
+  const day = date.getDay();
+  const hour = date.getHours();
+  const min = date.getMinutes();
+  const result = `${year}.${month}.${day} ${hour}:${min}`;
+  return result;
 }
