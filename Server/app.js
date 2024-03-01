@@ -95,27 +95,23 @@ const clients = new Map();
 wss.on('connection', onConnect);
 
 function onConnect(wsClient) {
-  //console.log('Connected a new user:', wsClient.cookies.uid);
-  console.log(wsClient.cookies);
   clients.set(wsClient, '');
-  console.log(`all clients:${clients}`);
-  // отправка приветственного сообщения клиенту
 
   wsClient.on('message', function message(data) {
     console.log('received: %s', data);
     console.log('JSON.parse', JSON.parse(data));
-    clients.set(wsClient, data.from)
+    clients.set(wsClient, JSON.parse(data).from)
 
     // clients.filter((client) => client != wsClient)
     //   .forEach((client) => {
-      for(key of clients.keys()){
+      for(const [key, value] of clients.entries()){
         const newData = {
-          date: data.date,
-          from: data.from,
-          to: data.to === 0 ? clients.get(client) : data.to,
-          data: data.data,
+          date: JSON.parse(data).date,
+          from: JSON.parse(data).from,
+          to: JSON.parse(data).to === 0 ? value : JSON.parse(data).to,
+          data: JSON.parse(data).data,
         }
-        key.send(newData.toString());
+        key.send(JSON.stringify(newData));
       };
   });
   wsClient.on('close', function() {
